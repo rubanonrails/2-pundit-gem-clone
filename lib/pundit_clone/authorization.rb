@@ -3,22 +3,30 @@ module PunditClone
     extend ActiveSupport::Concern
 
     included do
-      helper_method :policy
+      helper_method :policy if respond_to?(:helper_method)
     end
 
-    def policy_scope(klass)
-      policy_scope_klass(klass).new(current_user, klass).resolve
+    def policy_scope(klass, user = default_user)
+      policy_scope_klass(klass).new(user, klass).resolve
     end
 
-    def authorize(record)
-      policy(record).send("#{action_name}?") or raise NotAuthorizedError
+    def authorize(record, user = default_user, query = default_query)
+      policy(record, user).send(query) or raise NotAuthorizedError
     end
 
-    def policy(record)
-      policy_klass(record).new(current_user, record)
+    def policy(record, user = default_user)
+      policy_klass(record).new(user, record)
     end
 
     private
+
+    def default_query
+      "#{action_name}?"
+    end
+
+    def default_user
+      current_user
+    end
 
     def policy_klass(record)
       "#{record.class}Policy".constantize
