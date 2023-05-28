@@ -1,8 +1,9 @@
 # frozen_string_literal: true
+require "active_support/concern"
 
-require_relative "pundit_clone/version"
+require "pundit_clone/version"
+require "pundit_clone/authorization"
 
 module PunditClone
-  class Error < StandardError; end
-  # Your code goes here...
+  class NotAuthorizedError < StandardError; end
 end
